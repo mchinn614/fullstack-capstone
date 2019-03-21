@@ -7,7 +7,7 @@ const { app, runServer, closeServer } = require("../server");
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-describe("integration test", function() {
+describe("client test", function() {
   before(runServer);
   after(closeServer);
   it("test root endpoint", function() {
