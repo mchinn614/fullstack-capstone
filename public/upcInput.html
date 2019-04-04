@@ -16,8 +16,7 @@
         <header role="navigation">
           <ul>
             <li><a class="home">Home</a></li>
-            <li><a class="add-item">Add Item</a></li>
-            <li><a class="login" href="index.html">Login</a></li>
+            <li><a class="profile">Profile</a></li>
           </ul>
         </header>
       </div>
@@ -26,27 +25,36 @@
     <main role="main">
       <div class="row">
         <div class="col-12">
-          <section role="region" class="login">
-            <h2>Login</h2>
+          <section role="region" class="upc">
+            <h2>Enter product UPC</h2>
             <form class="input-form">
-              <fieldset>
-                <label for="username">Username</label>
-                <input type="text" class="username" name="username" required />
-                <label for="password">Password</label>
-                <input type="text" class="password" name="password" required />
-                <button type="submit">Login</button>
-              </fieldset>
+              <input class="upc-input" type="text" name="upc" value="035200264013" />
+              <input type="submit" name="submit" />
             </form>
-            <a href="createAccount.html">New user? Create Account</a>
-            <div class="row">
-              <div class="col-6">
-                <section role="region" class="messages"></section>
-              </div>
-            </div>
           </section>
         </div>
       </div>
+      <div class="row">
+        <div class="col-6">
+          <section role="region" class="results"></section>
+          <section role="region" class="messages"></section>
+        </div>
+      </div>
     </main>
+    <section role="region" class="profile hidden">
+      <div class="row">
+        <div class="col-3">
+          <p>pie chart here</p>
+        </div>
+        <div class="col-6">
+          <ul class="products">
+            <li class="product-name">
+              test
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://underscorejs.org/underscore-min.js"></script>
