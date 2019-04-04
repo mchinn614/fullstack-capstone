@@ -1,16 +1,15 @@
-const mongoose = require("mongoose");
-mongoose.connect();
+const mongoose = require('mongoose');
 
 //schema
-const userSchema = mongoose.Schema({
-  name: {
-    firstName: String,
-    lastName: String
-  },
-  email: String,
-  hashPassword: String,
-  items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Items" }]
-});
+// const userSchema = mongoose.Schema({
+//   name: {
+//     firstName: String,
+//     lastName: String
+//   },
+//   email: String,
+//   hashPassword: String,
+//   items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Items" }]
+// });
 
 const itemSchema = mongoose.Schema({
   product: {
@@ -30,7 +29,7 @@ const itemSchema = mongoose.Schema({
     images: [],
     offers: []
   },
-  materials: [{ type: mongoose.Schema.Types.ObjectId, ref: "Materials" }]
+  materials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Materials' }]
 });
 
 const materialSchema = mongoose.Schema({
@@ -38,18 +37,40 @@ const materialSchema = mongoose.Schema({
   images: []
 });
 
-const countySchema = mongoose.Schema({
-  countyName: String,
-  recyclableMaterial: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Materials" }
-  ]
+const citySchema = mongoose.Schema({
+  cityName: String,
+  recyclableMaterial: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Materials' }]
 });
 
-userSchema.virtual("fullName").get(function() {
-  return `${this.name.firstName} ${this.name.lastName}`;
+// const userProfile = mongoose.Schema({
+//   user: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' },
+//   productHistory: [{ itemId: { type: mongoose.Schema.Types.ObjectId, ref: 'Items' } }],
+//   voteHistory: [
+//     {
+//       item: { type: mongoose.Schema.Types.ObjectId, ref: 'Items' },
+//       material: { type: mongoose.Schema.Types.ObjectId, ref: 'Materials' },
+//       vote: Number
+//     }
+//   ]
+// });
+
+const voteSchema = mongoose.Schema({
+  item: { type: mongoose.Schema.Types.ObjectId, ref: 'Items' },
+  material: { type: mongoose.Schema.Types.ObjectId, ref: 'Materials' },
+  vote: Number,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
-const Users = mongoose.model("Users", userSchema);
-const Items = mongoose.model("Items", itemSchema);
-const Materials = mongoose.model("Materials", materialSchema);
-const Counties = mongoose.model("Counties", countySchema);
+const purchaseSchema = mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Items' }]
+});
+
+// const Users = mongoose.model("User", userSchema);
+const Items = mongoose.model('Items', itemSchema);
+const Materials = mongoose.model('Materials', materialSchema);
+const City = mongoose.model('City', citySchema);
+const Vote = mongoose.model('Vote', voteSchema);
+const Purchase = mongoose.model('Purchase', purchaseSchema);
+
+module.exports = { Items, Materials, City, Vote, Purchase };
