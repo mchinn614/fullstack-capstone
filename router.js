@@ -36,11 +36,19 @@ router.get('/upc/:upc', function(req, res) {
       //add item to db if item is return
       Items.findOneAndUpdate(
         { 'product.upc': item.upc },
-        { $set: { product: item, materials: [] } },
+        { $set: { product: item } },
         { upsert: true, new: true }
       )
+        .populate('materials')
         .then(newItem => {
-          res.status(200).json(newItem);
+          if (newItem.materials) {
+            return res.status(200).json(newItem);
+          }
+          return Items.findOneAndUpdate(
+            { 'product.upc': item.upc },
+            { $set: { product: item, materials: [] } },
+            { upsert: true, new: true }
+          ).then(newItem2 => res.status(200).json(newItem2));
         })
         .catch(err => {
           res.status(unknownError.status).json(unknownError);
@@ -67,6 +75,7 @@ router.post('/purchase', bodyParser.json(), (req, res) => {
     { new: true, upsert: true }
   )
     .then(addedPurchase => {
+      console.log(addedPurchase);
       if (!addedPurchase.user) {
         const err = {
           code: '004',
@@ -75,9 +84,12 @@ router.post('/purchase', bodyParser.json(), (req, res) => {
         };
         throw err;
       }
-      return res.status(200).json(addedPurchase);
+      // ERROR here=why can't I pass err.message or err.status to res
+      else {
+        return res.status(200).json(addedPurchase);
+      }
     })
-    .catch(err => res.status(err.status).json(err));
+    .catch(err => res.status(406).send(err.message));
 });
 
 //POST: add new material to item
@@ -175,20 +187,20 @@ router.get('/item/:itemId', (req, res) => {
 router.get('/voteCount', bodyParser.json(), (req, res) => {
   const requiredFields = ['materialId', 'itemId'];
   for (let i = 0; i < requiredFields.length; i++) {
-    if (!(requiredFields[i] in req.body)) {
-      res.status(400).send(`Req body must include ${requiredFields[i]}`);
+    if (!(requiredFields[i] in req.query)) {
+      res.status(400).send(`query params must include ${requiredFields[i]}`);
     }
   }
-  return Vote.where({ material: req.body.materialId, item: req.body.itemId, vote: 1 })
+  return Vote.where({ material: req.query.materialId, item: req.query.itemId, vote: 1 })
     .count()
     .then(upVote => {
-      return Vote.where({ material: req.body.materialId, item: req.body.itemId, vote: -1 })
+      return Vote.where({ material: req.query.materialId, item: req.query.itemId, vote: -1 })
         .count()
         .then(downVote => {
-          return Items.findOne({ _id: req.body.itemId })
+          return Items.findOne({ _id: req.query.itemId })
             .populate({ path: 'materials', populate: { path: 'materials' } })
             .then(item => {
-              const material = item.materials.filter(x => x._id == req.body.materialId);
+              const material = item.materials.filter(x => x._id == req.query.materialId);
               const voteItem = Object.assign(
                 { product: item.product, material: material[0] },
                 { upVote: upVote, downVote: downVote }
@@ -204,11 +216,11 @@ router.get('/voteCount', bodyParser.json(), (req, res) => {
 router.get('/userVote', bodyParser.json(), (req, res) => {
   const requiredFields = ['materialId', 'itemId', 'userId'];
   for (let i = 0; i < requiredFields.length; i++) {
-    if (!(requiredFields[i] in req.body)) {
-      res.status(400).send(`Req body must include ${requiredFields[i]}`);
+    if (!(requiredFields[i] in req.query)) {
+      res.status(400).send(`req.query must include ${requiredFields[i]}`);
     }
   }
-  Vote.find({ material: req.body.materialId, item: req.body.itemId, user: req.body.userId })
+  Vote.find({ material: req.query.materialId, item: req.query.itemId, user: req.query.userId })
     .populate('item')
     .populate('material')
     .populate('user')
@@ -220,8 +232,9 @@ router.get('/userVote', bodyParser.json(), (req, res) => {
           message: 'vote not found'
         };
         throw err;
+      } else {
+        res.status(200).json(vote);
       }
-      res.status(200).json(vote);
     })
     .catch(err => {
       res.status(err.status).json(err);
@@ -232,8 +245,8 @@ router.get('/userVote', bodyParser.json(), (req, res) => {
 router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
   const requiredFields = ['cityId'];
   for (let i = 0; i < requiredFields.length; i++) {
-    if (!(requiredFields[i] in req.body)) {
-      res.status(400).send(`Req body must include ${requiredFields[i]}`);
+    if (!(requiredFields[i] in req.query)) {
+      res.status(400).send(`req.query must include ${requiredFields[i]}`);
     }
   }
   return Purchase.findOne({ user: req.params.userId })
@@ -250,7 +263,7 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
         throw err;
       }
 
-      return City.findOne({ _id: req.body.cityId })
+      return City.findOne({ _id: req.query.cityId })
         .then(city => {
           console.log('city', city);
           let result = [];
@@ -327,6 +340,13 @@ router.delete('/purchase', bodyParser.json(), (req, res) => {
       });
     })
     .catch(err => res.status(err.status).json(err));
+});
+
+// GET Users
+router.get('/user/:userName', (req, res) => {
+  User.findOne({ username: req.params.userName }).then(user => {
+    res.status(200).json(user);
+  });
 });
 //add new material - for dev only
 router.post('/materials', bodyParser.json(), (req, res) => {
