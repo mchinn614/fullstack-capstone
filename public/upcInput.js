@@ -3,76 +3,93 @@
 //Get and store jwt and userid for requests in session storage
 const userName = JSON.parse(sessionStorage.getItem('username'));
 const jwt = JSON.parse(sessionStorage.getItem('jwt'));
-const userId = fetch(`/api/user/${userName}`, {
-  method: 'GET',
-  withCredentials: true,
-  credentials: 'include',
+const userId = JSON.parse(sessionStorage.getItem('userId'));
+var dataStore = {};
+const materials = fetch('/api/materials', {
   headers: {
     authorization: `Bearer ${jwt.authToken}`
   }
 })
   .then(response => {
-    console.log(response);
+    if (!response.ok) {
+      throw new Error('Materials not found');
+    }
     return response.json();
   })
-  .then(user => {
-    console.log(user);
-    sessionStorage.setItem('userId', JSON.stringify(user._id));
-    return user._id;
+  .then(materials => {
+    Object.assign(dataStore, { materials: materials });
+    console.log(dataStore);
   });
 
-const mockData = [
-  {
-    product: {
-      ean: '0035200264013',
-      title: 'Riceland American Jasmine Rice 2 Lb',
-      description: '',
-      upc: '035200264013',
-      elid: '281779262202',
-      brand: 'Riceland',
-      model: '',
-      color: '',
-      size: '',
-      dimension: '',
-      weight: '',
-      lowest_recorded_price: 62.71,
-      highest_recorded_price: 62.71,
-      images: [],
-      offers: []
-    },
-    materials: [
-      { material: 'plastic', recyclable: true },
-      { material: 'cardboard', recyclable: true }
-    ]
+//Function to render imtem
+function displayItem(item) {
+  $('.results').empty();
+
+  //Store item
+  dataStore.item = item;
+  $('.results').append(
+    `<h3 data-id="${item._id}">${item.product.title}</h3><ul class="material-list"></ul>`
+  );
+
+  //Create array of promises
+  var promises = [];
+  for (let i = 0; i < item.materials.length; i++) {
+    let queryString = $.param({
+      userId: userId,
+      itemId: item._id,
+      materialId: item.materials[i]._id
+    });
+    promises.push(
+      fetch('/api/userVote?' + queryString, {
+        headers: {
+          Authorization: `Bearer ${jwt.authToken}`
+        }
+      })
+        .then(response => {
+          if (response.ok) {
+            return response.json().vote;
+          } else {
+            return 0;
+          }
+        })
+        .then(vote => {
+          console.log(vote);
+          //Get total vote count
+          const voteCountQuery = $.param({ itemId: item._id, materialId: item.materials[i]._id });
+          return fetch('/api/voteCount?' + voteCountQuery, {
+            headers: {
+              Authorization: `Bearer ${jwt.authToken}`
+            }
+          })
+            .then(response => response.json())
+            .then(totalVote => {
+              console.log(totalVote);
+              $('.material-list').append(
+                `<li data-id="${item.materials[i]._id}">${
+                  item.materials[i].materialName
+                }<button data-vote-id="${vote}" class="vote up-vote">Up Vote (${
+                  totalVote.upVote
+                })</button><button data-vote-id="${vote}" class="vote down-vote">Down Vote (${
+                  totalVote.downVote
+                })</button></li>`
+              );
+              return totalVote;
+            });
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    );
   }
-];
-
-const mockMaterials = {
-  materials: ['plastic', 'cardboard', 'aluminum', 'rubber', 'steel', 'paper']
-};
-
-const mockCounty = {
-  countyName: 'San Francisco',
-  recyclableMaterials: ['plastic', 'cardboard', 'aluminum', 'paper']
-};
-
-const mockUser = {};
-
-var tempList = [];
-
-//UPC Item Db API get
-function getProduct(upc) {
-  //get data
-  for (let i = 0; i < mockData.length; i++) {
-    if (upc === mockData[i].product.upc) {
-      return mockData[i];
-    }
-  }
+  Promise.all(promises).then(() => {
+    $('.results').append(`<button class=add-material>Add New Material</button>`);
+    $(addMaterial);
+    $(vote);
+  });
 }
 
 //Render list of materials to results section
 function renderItems(upc) {
-  $('.results').empty();
   fetch(`/api/upc/${upc}`, {
     headers: {
       Authorization: `Bearer ${jwt.authToken}`
@@ -87,65 +104,15 @@ function renderItems(upc) {
       }
     })
     .then(item => {
-      $('.results').append(
-        `<h3 data-id="${item._id}">${item.product.title}</h3><ul class="material-list"></ul>`
-      );
-      for (let i = 0; i < item.materials.length; i++) {
-        let queryString = $.param({
-          userId: JSON.parse(sessionStorage.getItem('userId')),
-          itemId: item._id,
-          materialId: item.materials[i]._id
-        });
-        fetch('/api/userVote?' + queryString, {
-          headers: {
-            Authorization: `Bearer ${jwt.authToken}`
-          }
-        })
-          .then(response => {
-            console.log(response);
-            if (response.ok) {
-              return response.json().vote;
-            } else {
-              return 0;
-            }
-          })
-          .then(vote => {
-            //Get total vote count
-            const voteCountQuery = $.param({ itemId: item._id, materialId: item.materials[i]._id });
-            fetch('/api/voteCount?' + voteCountQuery, {
-              headers: {
-                Authorization: `Bearer ${jwt.authToken}`
-              }
-            })
-              .then(response => response.json())
-              .then(totalVote => {
-                $('.material-list').append(
-                  `<li data-id="${item.materials[i]._id}">${
-                    item.materials[i].materialName
-                  }<button data-vote-id="${vote}" class=up-vote>Up Vote (${
-                    totalVote.upVote
-                  })</button><button data-vote-id="${vote}" class=down-vote>Down Vote (${
-                    totalVote.downVote
-                  })</button></li>`
-                );
-              });
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      }
-      $('.results').append(`<button class=add-material>Add New Material</button>`);
-      $(addMaterial);
-
       // POST item to purchase history
-      return fetch('/api/purchase', {
+      fetch('/api/purchase', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt.authToken}`
         },
         body: JSON.stringify({
-          userId: JSON.parse(sessionStorage.getItem('userId')),
+          userId: userId,
           itemId: item._id
         })
       }).then(response => {
@@ -156,51 +123,59 @@ function renderItems(upc) {
           throw err;
         }
       });
+      return displayItem(item);
     })
     .catch(err => {
       console.log(err);
       $('.messages').append(`<p>${err.message}</p>`);
     });
 }
-//   console.log(result);
-//   var listResult = '';
-//   for (let j = 0; j < result.materials.length; j++) {
-//     listResult =
-//       listResult +
-//       `<tr class="table-row">
-//             <td class="material-name" id=${result.materials[j].material} data-id= >${
-//         result.materials[j].material
-//       }</td>
-//             <td class="recyclable-check">${result.materials[j].recyclable}</td>
-//             <td class="delete-button">
-//             <button type="button" class="delete">Delete</button>
-//             </td>
-//         </tr>`;
-//   }
-
-//   var htmlTable = `<h4>${result.product.title}</h4><table class="material-table" style="width:100%">
-//         <tr class="table-row">
-//             <th>Material</th>
-//             <th>Recyclable?</th>
-//             <th></th>
-//         </tr>
-//         ${listResult}
-//     </table>
-//     <button type="button" class="add-new">Add New Material</button>
-//     <button type="button" class="save">Save</button>`;
-//   $('.results').append(htmlTable);
-//   $(addMaterial);
-//   $(save);
-//   $(deleteMaterial);
-
-//   //add event listener for add-new button
-// }
-
-function addNewMaterial(materialName, recycle) {
-  mockData.materials.push({ material: materialName, recyclable: recycle });
-}
 
 //event listeners
+//ERRROR with voting delayed. and then renders copy of materials??
+function vote() {
+  $('.messages').empty();
+  $('.vote').each(function() {
+    $(this).on('click', event => {
+      console.log($(this).attr('class'));
+      if ($(this).hasClass('up-vote')) {
+        var vote = 1;
+      } else {
+        var vote = -1;
+      }
+
+      fetch('/api/vote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt.authToken}`
+        },
+        body: JSON.stringify({
+          userId: userId,
+          itemId: dataStore.item._id,
+          materialId: $(this)
+            .parent('li')
+            .attr('data-id'),
+          vote: vote
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw response;
+          } else {
+            return response.json();
+          }
+        })
+        .then(updatedVote => {
+          return displayItem(dataStore.item);
+        })
+        .catch(err => {
+          err.json().then(errObj => $('.messages').append(`<p>${errObj.message}</p>`));
+        });
+    });
+  });
+}
+
 function addMaterial() {
   $('.add-material').on('click', event => {
     $('.material-list').append(
@@ -209,11 +184,11 @@ function addMaterial() {
         </div>`
     );
     // constructs the suggestion engine
-    var states = new Bloodhound({
+    var materials = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.whitespace,
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       // `states` is an array of state names defined in "The Basics"
-      local: mockMaterials.materials
+      local: dataStore.materials.map(x => x.materialName)
     });
 
     $('#bloodhound .typeahead').typeahead(
@@ -224,65 +199,63 @@ function addMaterial() {
       },
       {
         name: 'materials',
-        source: states
+        source: materials
       }
     );
+    $('.results').append('<button class="save">Save</button>');
+    $(save);
   });
 }
 
 function save() {
   $('.save').on('click', event => {
     $('.messages').empty();
-    var newMaterial = [];
-    $('.typeahead').map(function() {
-      newMaterial.push($(this).val());
-    });
 
-    console.log(newMaterial);
-    //check if material is valid, and then if it is recyclable
-    for (let i = 0; i < newMaterial.length; i++) {
-      if (!mockMaterials.materials.includes(newMaterial[i])) {
-        $('.messages').append(
-          `<p class="warning">${
-            newMaterial[i]
-          } is not a valid material for this app. Please use a different material.</p>`
-        );
-      } else {
-        //determine if material is recyclable
-        var addedMaterial = {};
-        if (mockCounty.recyclableMaterials.includes(newMaterial[i])) {
-          addedMaterial = {
-            material: newMaterial[i],
-            recyclable: true
-          };
+    var newMaterial = $('.tt-input').val();
+    var materialId = dataStore.materials.filter(x => x.materialName === newMaterial)[0]._id;
+
+    fetch('/api/addMaterialToItem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt.authToken}`
+      },
+      body: JSON.stringify({
+        materialId: materialId,
+        itemId: dataStore.item._id
+      })
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw response;
         } else {
-          addedMaterial = {
-            material: newMaterial[i],
-            recyclable: false
-          };
+          return response.json();
         }
-
-        var materialIsNew = true;
-        for (let j = 0; j < mockData[0].materials.length; j++) {
-          if (_.isEqual(addedMaterial, mockData[0].materials[j])) {
-            $('.messages').append(
-              `<p class='warning'>${newMaterial[i]} already exists in database</p>`
-            );
-            materialIsNew = false;
-            break;
-          }
-        }
-
-        if (materialIsNew) {
-          mockData[0].materials.push(addedMaterial);
-          console.log(mockData);
-          $('.messages').append(`<p class='warning'>Added ${newMaterial[i]} to database!</p>`);
-        }
-      }
-    }
-    //clear and re-render
-    $('.results').empty();
-    renderMaterials(mockData[0].product.upc);
+      })
+      .then(updatedItem => {
+        //vote
+        fetch('/api/vote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt.authToken}`
+          },
+          body: JSON.stringify({
+            materialId: materialId,
+            itemId: dataStore.item._id,
+            vote: 1,
+            userId: userId
+          })
+        }).then(() => {
+          displayItem(updatedItem);
+          $('.messages').append('<p>Material successfully added to item</p>');
+        });
+      })
+      .catch(err => {
+        err.json().then(errObj => {
+          $('.messages').append(`<p>${errObj.message}</p>`);
+        });
+      });
   });
 }
 
@@ -313,19 +286,30 @@ function watchSubmit() {
   });
 }
 
-function viewProfile() {
+//Profile
+function profile() {
   $('.profile').on('click', function() {
-    $('main').empty();
-    $('.profile').removeClass('hidden');
+    window.location.href = '/profile.html';
   });
 }
 
-function home() {
-  $('.home').on('click', function() {
-    location.reload();
+//Upc input view
+function input() {
+  $('.add-item').on('click', function() {
+    window.location.href = '/upcInput.html';
+  });
+}
+
+//Logout
+function logout() {
+  $('.logout').on('click', () => {
+    sessionStorage.clear();
+    dataStore = {};
+    window.location.href = '/index.html';
   });
 }
 
 $(watchSubmit);
-$(viewProfile);
-$(home);
+$(profile);
+$(input);
+$(logout);

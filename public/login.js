@@ -26,8 +26,27 @@ function watchSubmit() {
       .then(token => {
         sessionStorage.setItem('username', JSON.stringify(user));
         sessionStorage.setItem('jwt', JSON.stringify(token));
-        window.location.href = '/upcInput.html';
+        const userName = JSON.parse(sessionStorage.getItem('username'));
+        const jwt = JSON.parse(sessionStorage.getItem('jwt'));
+        return fetch(`/api/user/${userName}`, {
+          method: 'GET',
+          withCredentials: true,
+          credentials: 'include',
+          headers: {
+            authorization: `Bearer ${jwt.authToken}`
+          }
+        })
+          .then(response => {
+            console.log(response);
+            return response.json();
+          })
+          .then(user => {
+            console.log(user);
+            sessionStorage.setItem('userId', JSON.stringify(user._id));
+            return user._id;
+          });
       })
+      .then(() => (window.location.href = '/upcInput.html'))
       .catch(err => {
         $('.messages').append(`<p>${err.message}</p>`);
       });

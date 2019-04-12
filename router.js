@@ -102,8 +102,8 @@ router.post('/addMaterialToItem', bodyParser.json(), (req, res) => {
     }
   }
 
-  Items.findOne({ $and: [{ _id: req.body.itemId, materials: { $in: req.body.materialId } }] }).then(
-    mat => {
+  Items.findOne({ $and: [{ _id: req.body.itemId, materials: { $in: req.body.materialId } }] })
+    .then(mat => {
       console.log(mat);
       if (!(mat == null)) {
         const err = {
@@ -120,15 +120,13 @@ router.post('/addMaterialToItem', bodyParser.json(), (req, res) => {
         )
           .populate({ path: 'materials', populate: { path: 'materials' } })
           .then(updatedItem => {
-            console.log('updatedItem', updatedItem);
             return res.status(200).json(updatedItem);
-          })
-          .catch(err => {
-            return res.status(err.status).json(err);
           });
       }
-    }
-  );
+    })
+    .catch(err => {
+      res.status(err.status).json(err);
+    });
 });
 
 //POST: Add up/down vote
@@ -141,7 +139,11 @@ router.post('/vote', bodyParser.json(), (req, res) => {
   }
   //ensure vote is 1, -1
   if (!(req.body.vote === 1 || req.body.vote === -1)) {
-    res.status(400).send('Vote must be 1 or -1');
+    const err = {
+      status: 400,
+      message: 'Vote must be 1 or -1'
+    };
+    res.status(err.status).json(err);
   }
 
   //update vote collection
@@ -228,7 +230,7 @@ router.get('/userVote', bodyParser.json(), (req, res) => {
       if (!vote.item) {
         const err = {
           code: '005',
-          status: 406,
+          status: 404,
           message: 'vote not found'
         };
         throw err;
@@ -252,8 +254,10 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
   return Purchase.findOne({ user: req.params.userId })
     .populate('user')
     .populate({ path: 'items', populate: { path: 'items' } })
+    .populate({ path: 'items', populate: { path: 'materials', model: 'Materials' } })
     .then(purchase => {
       console.log('first purchase', purchase);
+      console.log('first purchase', purchase.items[0].materials);
       if (!purchase) {
         const err = {
           code: '007',
@@ -269,22 +273,26 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
           let result = [];
           console.log('items', purchase.items);
           for (let j = 0; j < purchase.items.length; j++) {
-            result.push({ item: purchase.items[j].product, materials: [] });
+            result.push({ item: purchase.items[j], recyclability: [] });
             console.log('materials', purchase.items[j].materials);
             for (let k = 0; k < purchase.items[j].materials.length; k++) {
-              console.log('city material', typeof city.recyclableMaterial.toString());
-              console.log('material', typeof purchase.items[j].materials[k].toString());
-              if (
+              if (purchase.items[j].materials[k] == null) {
+                const err = {
+                  status: 404,
+                  message: 'Material not found'
+                };
+                throw err;
+              } else if (
                 city.recyclableMaterial
                   .toString()
-                  .includes(purchase.items[j].materials[k].toString())
+                  .includes(purchase.items[j].materials[k]._id.toString())
               ) {
-                result[j].materials.push({
+                result[j].recyclability.push({
                   material: purchase.items[j].materials[k],
                   recyclable: true
                 });
               } else {
-                result[j].materials.push({
+                result[j].recyclability.push({
                   material: purchase.items[j].materials[k],
                   recyclable: false
                 });
@@ -298,7 +306,10 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
           res.status(200).json({ result: result });
         });
     })
-    .catch(err => res.status(err.status).json(err));
+    .catch(err => {
+      console.log(err);
+      res.status(err.status).json(err);
+    });
 });
 
 //DELETE item from purchase history
@@ -357,6 +368,13 @@ router.post('/materials', bodyParser.json(), (req, res) => {
     .catch(err => {
       res.status(unknownError.status).json(unknownError);
     });
+});
+
+//GET Materials
+router.get('/materials', (req, res) => {
+  Materials.find().then(materials => {
+    res.status(200).json(materials);
+  });
 });
 
 //add new city - for dev only
