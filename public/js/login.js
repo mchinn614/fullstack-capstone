@@ -6,28 +6,20 @@ function watchSubmit() {
     $('.messages').empty();
     const user = $('.username').val();
     const pw = $('.password').val();
-    fetch(`/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username: user, password: pw })
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          const err = {
-            message: 'Invalid login credentials'
-          };
-          throw err;
-        }
-      })
+    api
+      .postAuth(user, pw)
       .then(token => {
         sessionStorage.setItem('username', JSON.stringify(user));
         sessionStorage.setItem('jwt', JSON.stringify(token));
-        window.location.href = '/upcInput.html';
+        const userName = JSON.parse(sessionStorage.getItem('username'));
+        const jwt = JSON.parse(sessionStorage.getItem('jwt'));
+        return api.getUser(jwt.authToken, userName).then(user => {
+          console.log(user);
+          sessionStorage.setItem('userId', JSON.stringify(user._id));
+          return user._id;
+        });
       })
+      .then(() => (window.location.href = '../views/upcInput.html'))
       .catch(err => {
         $('.messages').append(`<p>${err.message}</p>`);
       });
