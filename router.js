@@ -324,7 +324,6 @@ router.delete('/purchase', bodyParser.json(), (req, res) => {
     $and: [{ user: req.body.userId }, { items: { $in: req.body.itemId } }]
   })
     .then(purchase => {
-      console.log('find purchase', purchase);
       if (!purchase) {
         const err = {
           code: '008',
@@ -333,20 +332,17 @@ router.delete('/purchase', bodyParser.json(), (req, res) => {
         };
         throw err;
       }
-      console.log('before', purchase.items);
       for (let i = 0; i < purchase.items.length; i++) {
         if (purchase.items[i] == req.body.itemId) {
           purchase.items.splice(i, 1);
           break;
         }
       }
-      console.log('after', purchase.items);
       return Purchase.findOneAndUpdate(
         { user: req.body.userId },
         { items: purchase.items },
         { new: true }
       ).then(updatedPurchase => {
-        console.log('updated Purchase', updatedPurchase);
         res.status(204).end();
       });
     })

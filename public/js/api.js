@@ -1,9 +1,8 @@
 'use strict';
 
-//API Requests here
-const api = () => {
+const api = (function() {
   function postUser(userName, pw) {
-    fetch('/api/users', {
+    return fetch('/api/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -18,7 +17,7 @@ const api = () => {
   }
 
   function postAuth(user, pw) {
-    fetch(`/api/auth/login`, {
+    return fetch(`/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -36,13 +35,13 @@ const api = () => {
     });
   }
 
-  function getUser(userName) {
-    fetch(`/api/user/${userName}`, {
+  function getUser(authToken, userName) {
+    return fetch(`/api/user/${userName}`, {
       method: 'GET',
       withCredentials: true,
       credentials: 'include',
       headers: {
-        authorization: `Bearer ${jwt.authToken}`
+        authorization: `Bearer ${authToken}`
       }
     }).then(response => {
       console.log(response);
@@ -53,10 +52,10 @@ const api = () => {
     });
   }
 
-  function getMaterials() {
-    fetch('/api/materials', {
+  function getMaterials(authToken) {
+    return fetch('/api/materials', {
       headers: {
-        authorization: `Bearer ${jwt.authToken}`
+        authorization: `Bearer ${authToken}`
       }
     }).then(response => {
       if (!response.ok) {
@@ -66,5 +65,163 @@ const api = () => {
     });
   }
 
-  return { postUser, postAuth, getUser, getMaterials };
-};
+  function getUserVote(authToken, userId, itemId, materialId) {
+    let queryString = $.param({
+      userId: userId,
+      itemId: itemId,
+      materialId: materialId
+    });
+    return fetch('/api/userVote?' + queryString, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    }).then(response => {
+      console.log(response);
+      if (response.ok) {
+        return response.json().vote;
+      } else {
+        return 0;
+      }
+    });
+  }
+
+  function getTotalVote(authToken, itemId, materialId) {
+    const voteCountQuery = $.param({ itemId: itemId, materialId: materialId });
+    return fetch('/api/voteCount?' + voteCountQuery, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    }).then(response => {
+      if (!response.ok) {
+        throw response;
+      } else {
+        return response.json();
+      }
+    });
+  }
+
+  function getItem(authToken, upc) {
+    return fetch(`/api/upc/${upc}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw response.json();
+      }
+    });
+  }
+
+  function postItem(authToken, userId, itemId) {
+    return fetch('/api/purchase', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        userId: userId,
+        itemId: itemId
+      })
+    }).then(response => {
+      if (!response.ok) {
+        const err = {
+          message: 'Item not registered'
+        };
+        throw err;
+      } else {
+        return response.json();
+      }
+    });
+  }
+
+  function postVote(authToken, userId, itemId, materialId, vote) {
+    return fetch('/api/vote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        userId: userId,
+        itemId: itemId,
+        materialId: materialId,
+        vote: vote
+      })
+    }).then(response => {
+      if (!response.ok) {
+        throw response;
+      } else {
+        return response.json();
+      }
+    });
+  }
+
+  function postMaterialToItem(authToken, materialId, itemId) {
+    return fetch('/api/addMaterialToItem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        materialId: materialId,
+        itemId: itemId
+      })
+    }).then(response => {
+      if (!response.ok) {
+        throw response;
+      } else {
+        return response.json();
+      }
+    });
+  }
+
+  function getPurchaseHistory(authToken, userId) {
+    return fetch(`/api/purchase/${userId}?cityId=5ca2d2bce3cdd0915f1e5897`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    }).then(response => {
+      if (!response.ok) {
+        throw response;
+      }
+      return response.json();
+    });
+  }
+
+  function deletePurchase(authToken, userId, itemId) {
+    return fetch(`/api/purchase`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        userId: userId,
+        itemId: itemId
+      })
+    }).then(response => {
+      if (!response.ok) {
+        throw response;
+      }
+    });
+  }
+
+  return {
+    postUser,
+    postAuth,
+    getUser,
+    getMaterials,
+    getUserVote,
+    getTotalVote,
+    getItem,
+    postItem,
+    postVote,
+    postMaterialToItem,
+    getPurchaseHistory,
+    deletePurchase
+  };
+})();

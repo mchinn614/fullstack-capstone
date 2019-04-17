@@ -1,11 +1,11 @@
 'use strict';
-const local = () => {
+const local = (() => {
   function getUserId() {
     return JSON.parse(sessionStorage.getItem('userId'));
   }
 
   function getJwt() {
-    return JSON.parse(sessionStorage.getItem('jwt'));
+    return JSON.parse(sessionStorage.getItem('jwt')).authToken;
   }
 
   function getUserName() {
@@ -15,4 +15,4 @@ const local = () => {
   var dataStore = {};
 
   return { getUserId, getJwt, getUserName, dataStore };
-};
+})();

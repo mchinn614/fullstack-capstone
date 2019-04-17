@@ -4,26 +4,15 @@ function watchSubmit() {
   $('.input-form').on('submit', event => {
     event.preventDefault();
     $('.messages').empty();
-    const username = $('.new-username').val();
+    const userName = $('.new-username').val();
     const pw1 = $('.new-password1').val();
     const pw2 = $('.new-password2').val();
     //check if passwords match
     if (!(pw1 === pw2)) {
       $('.messages').append(`<p>Passwords do no match, please try again</p>`);
     } else {
-      fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username: username, password: pw1 })
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw response;
-          }
-          return response.json();
-        })
+      api
+        .postUser(userName, pw1)
         .then(responseJson => {
           console.log(responseJson);
           $('.messages').append(

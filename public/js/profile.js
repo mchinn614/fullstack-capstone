@@ -1,31 +1,23 @@
 'use strict';
 
 //Load Profile Information
-const userId = JSON.parse(sessionStorage.getItem('userId'));
-const jwt = JSON.parse(sessionStorage.getItem('jwt'));
+const jwt = local.getJwt();
+const userId = local.getUserId();
 
 function renderProfile() {
-  fetch(`/api/purchase/${userId}?cityId=5ca2d2bce3cdd0915f1e5897`, {
-    headers: {
-      Authorization: `Bearer ${jwt.authToken}`
-    }
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw response;
-      }
-      return response.json();
-    })
+  api
+    .getPurchaseHistory(jwt, userId)
     .then(purchaseHistory => {
       const purchases = purchaseHistory.result;
       console.log(purchases);
 
       $('.page-results').pagination({
         dataSource: purchases,
-        pageSize: 10,
+        pageSize: 5,
         callback: function(data, pagination) {
           var html = template(data);
           $('.results').html(html);
+          $(deleteItem);
         }
       });
       return purchases;
@@ -42,8 +34,6 @@ function renderProfile() {
       });
 
       makeChart(countRecycle, total);
-
-      $(deleteItem);
     })
     .catch(err => {
       err.json().then(errObj => {
@@ -107,19 +97,28 @@ function deleteItem() {
       .find('h3')
       .attr('data-item-id');
     console.log(itemId);
+    return api
+      .deletePurchase(jwt, userId, itemId)
+      .then(() => renderProfile())
+      .catch(err => {
+        console.log(err);
+        err.json().then(errObj => {
+          console.log(errObj);
+        });
+      });
   });
 }
 //Profile
 function profile() {
   $('.profile').on('click', function() {
-    window.location.href = '/profile.html';
+    window.location.href = '/views/profile.html';
   });
 }
 
 //Upc input view
 function input() {
   $('.add-item').on('click', function() {
-    window.location.href = '/upcInput.html';
+    window.location.href = '/views/upcInput.html';
   });
 }
 
