@@ -55,7 +55,7 @@ router.get('/upc/:upc', function(req, res) {
         });
     })
     .catch(err => {
-      console.log(err.message);
+      // console.log(err.message);
       res.status(err.status).json(err);
     });
 });
@@ -75,7 +75,7 @@ router.post('/purchase', bodyParser.json(), (req, res) => {
     { new: true, upsert: true }
   )
     .then(addedPurchase => {
-      console.log(addedPurchase);
+      // console.log(addedPurchase);
       if (!addedPurchase.user) {
         const err = {
           code: '004',
@@ -104,7 +104,7 @@ router.post('/addMaterialToItem', bodyParser.json(), (req, res) => {
 
   Items.findOne({ $and: [{ _id: req.body.itemId, materials: { $in: req.body.materialId } }] })
     .then(mat => {
-      console.log(mat);
+      // console.log(mat);
       if (!(mat == null)) {
         const err = {
           code: '001',
@@ -158,8 +158,7 @@ router.post('/vote', bodyParser.json(), (req, res) => {
     { upsert: true, new: true }
   )
     .then(updatedPurchase => {
-      console.log('updatedPurchase', updatedPurchase);
-      res.status(201).json(updatedPurchase);
+      res.status(200).json(updatedPurchase);
     })
     .catch(() => res.status(unknownError.status).json(unknownError));
 });
@@ -227,7 +226,8 @@ router.get('/userVote', bodyParser.json(), (req, res) => {
     .populate('material')
     .populate('user')
     .then(vote => {
-      if (!vote.item) {
+      // console.log('vote', vote);
+      if (!vote[0].item) {
         const err = {
           code: '005',
           status: 404,
@@ -256,8 +256,8 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
     .populate({ path: 'items', populate: { path: 'items' } })
     .populate({ path: 'items', populate: { path: 'materials', model: 'Materials' } })
     .then(purchase => {
-      console.log('first purchase', purchase);
-      console.log('first purchase', purchase.items[0].materials);
+      // console.log('first purchase', purchase);
+      // console.log('first purchase', purchase.items[0].materials);
       if (!purchase) {
         const err = {
           code: '007',
@@ -269,12 +269,12 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
 
       return City.findOne({ _id: req.query.cityId })
         .then(city => {
-          console.log('city', city);
+          // console.log('city', city);
           let result = [];
-          console.log('items', purchase.items);
+          // console.log('items', purchase.items);
           for (let j = 0; j < purchase.items.length; j++) {
             result.push({ item: purchase.items[j], recyclability: [] });
-            console.log('materials', purchase.items[j].materials);
+            // console.log('materials', purchase.items[j].materials);
             for (let k = 0; k < purchase.items[j].materials.length; k++) {
               if (purchase.items[j].materials[k] == null) {
                 const err = {
@@ -302,12 +302,12 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
           return result;
         })
         .then(result => {
-          console.log(result);
+          // console.log(result);
           res.status(200).json({ result: result });
         });
     })
     .catch(err => {
-      console.log(err);
+      // console.log(err);
       res.status(err.status).json(err);
     });
 });
@@ -380,13 +380,13 @@ router.post('/city/:city', bodyParser.json(), (req, res) => {
   for (let i = 0; i < recycleMaterials.length; i++) {
     Materials.findOne({ materialName: recycleMaterials[i] })
       .then(mat => {
-        console.log(mat._id);
+        // console.log(mat._id);
         if (mat) {
           materialIds.push(mat._id);
           return materialIds;
         } else {
           Materials.create({ materialName: recycleMaterials[i] }).then((err, item) => {
-            console.log(item);
+            // console.log(item);
             materialIds.push(item._id);
             return MaterialIds;
           });
