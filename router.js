@@ -227,7 +227,7 @@ router.get('/userVote', bodyParser.json(), (req, res) => {
     .populate('user')
     .then(vote => {
       // console.log('vote', vote);
-      if (!vote[0].item) {
+      if (!vote.length) {
         const err = {
           code: '005',
           status: 404,
