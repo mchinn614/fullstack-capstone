@@ -94,21 +94,19 @@ function vote() {
   $('.messages').empty();
   $('.vote').on('click', function() {
     console.log($(this).attr('class'));
-    if ($(this).hasClass('up-vote')) {
-      var vote = 1;
-    } else {
-      var vote = -1;
-    }
+
+    let vote = $(this).hasClass('up-vote') ? 1 : -1;
+
     const materialId = $(this)
       .closest('li')
       .attr('data-id');
 
     console.log(materialId);
-    return api
+    api
       .postVote(jwt, userId, local.dataStore.item._id, materialId, vote)
       .then(updatedVote => {
         console.log(updatedVote);
-        return renderVoteButton(`.${materialId}`, local.dataStore.item._id, materialId);
+        renderVoteButton(`.${materialId}`, local.dataStore.item._id, materialId);
       })
       .catch(err => {
         err.json().then(errObj => $('.messages').append(`<p>${errObj.message}</p>`));
