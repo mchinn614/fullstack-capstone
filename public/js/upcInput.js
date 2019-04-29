@@ -57,6 +57,7 @@ function renderVoteButton(domTarget, itemId, materialId) {
   return api.getTotalVote(jwt, itemId, materialId).then(totalVote => {
     return api.getUserVote(jwt, userId, itemId, materialId).then(userVote => {
       $(domTarget).empty();
+
       $(domTarget).append(
         `<div class="button-container">
           <button  class="vote up-vote vote-${userVote}">
