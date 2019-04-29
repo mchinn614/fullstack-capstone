@@ -12,7 +12,8 @@ const unknownError = {
   status: 500
 };
 
-//UPC DB request to return first item
+// UPC DB request to return first item
+
 function getUpc(upc) {
   return axios.get(`https://api.upcitemdb.com/prod/trial/lookup?upc=${upc}`).then(res => {
     return res.data.items[0];

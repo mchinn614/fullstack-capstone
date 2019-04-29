@@ -21,9 +21,52 @@ function watchSubmit() {
       })
       .then(() => (window.location.href = '../views/upcInput.html'))
       .catch(err => {
-        $('.messages').append(`<p>${err.message}</p>`);
+        $('.messages').append(`<p class="error-message">${err.message}</p>`);
       });
   });
 }
+//Profile
+function profile() {
+  $('.profile').on('click', function() {
+    $('.messages').empty();
+    try {
+      const jwt = local.getJwt();
+      console.log(jwt);
+      window.location.href = '/views/profile.html';
+    } catch {
+      $('.messages').append(`<p class="error-message">Please login first</p>`);
+    }
+  });
+}
 
+//Upc input view
+function input() {
+  $('.add-item').on('click', function() {
+    $('.messages').empty();
+
+    try {
+      const jwt = local.getJwt();
+      window.location.href = '/views/upcInput.html';
+    } catch {
+      $('.messages').append(`<p class="error-message">Please login first</p>`);
+    }
+  });
+}
+
+//Login
+function login() {
+  $('.login').on('click', () => {
+    $('.messages').empty();
+    try {
+      const jwt = local.getJwt();
+      window.location.href = '/views/profile.html';
+    } catch {
+      $('.messages').append(`<p class="error-message">Please login using valid credentials</p>`);
+    }
+  });
+}
+
+$(profile);
+$(input);
+$(login);
 $(watchSubmit);

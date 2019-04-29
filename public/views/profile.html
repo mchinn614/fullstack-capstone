@@ -11,13 +11,24 @@
   </head>
 
   <body>
-    <div class="row">
+    <div class="row nav-bar">
       <div class="col-12">
         <header role="navigation">
-          <ul>
-            <li><a class="profile">Profile</a></li>
-            <li><a class="add-item">Add Item</a></li>
-            <li><a class="logout">Logout</a></li>
+          <ul class="nav-list">
+            <li class="app-title">
+              <div class="app-name">
+                <img
+                  class="recycle-symbol"
+                  src="..\images\recycle-symbol.png"
+                  alt="recycle symbol"
+                  height="30"
+                  width="30"
+                />recycle-app
+              </div>
+            </li>
+            <li class="nav-button"><a class="profile">Profile</a></li>
+            <li class="nav-button"><a class="add-item">Add Item</a></li>
+            <li class="nav-button"><a class="logout">Logout</a></li>
           </ul>
         </header>
       </div>
@@ -34,6 +45,7 @@
         </div>
         <div class="col-6">
           <section role="region" class="summary"></section>
+          <h2>Summary of Purchases</h2>
           <div id="chartContainer" style="height: 370px; width: 100%;"></div>
         </div>
       </div>

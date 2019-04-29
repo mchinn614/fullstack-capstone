@@ -3,6 +3,11 @@
 //Load Profile Information
 const jwt = local.getJwt();
 const userId = local.getUserId();
+const userName = local.getUserName();
+
+//set userId
+$('.logout').empty();
+$('.logout').append(`Logout (${userName})`);
 
 function renderProfile() {
   api
@@ -46,16 +51,15 @@ function template(purchases) {
   console.log(purchases);
   return purchases.map(purchase => {
     console.log(purchase.recyclability);
-    return `<div>
+    return `<div class="profile-list">
     <h3 class="product-name" data-item-id="${purchase.item._id}">${purchase.item.product.title}</h3>
-  <ul class="materials">
+  <p class="materials">Materials: 
     ${purchase.recyclability
       .map(mat => {
-        console.log(mat);
-        return `<li data-recyclable-id="${mat.recyclable}">${mat.material.materialName}</li>`;
+        return `${mat.material.materialName}`;
       })
-      .join('')}
-    </ul>
+      .join(', ')}
+    </p>
     <button type="button" class="delete-item">Delete Item</button>
     </div>`;
   });
@@ -67,21 +71,23 @@ function template(purchases) {
 function makeChart(recycleCount, total) {
   $('#chartContainer').empty();
   var options = {
-    title: {
-      text: 'Summary of Recycability of Purchases'
+    backgroundColor: 'white',
+    legend: {
+      fontColor: 'black',
+      fontFamily: 'roboto',
+      fontSize: 16
     },
     data: [
       {
         type: 'pie',
         startAngle: -45,
         showInLegend: 'true',
-        legendText: '{label}',
-        indexLabel: '#percent%',
+        legendText: '{indexLabel}',
         percentFormatString: '##.00',
-        toolTipContent: '{y} {#percent%}',
+        toolTipContent: '#percent%',
         dataPoints: [
-          { label: 'Recyclable', y: (recycleCount / total) * 100 },
-          { label: 'Non-recyclable', y: ((total - recycleCount) / total) * 100 }
+          { indexLabel: 'Recyclable', y: (recycleCount / total) * 100 },
+          { indexLabel: 'Non-recyclable', y: ((total - recycleCount) / total) * 100 }
         ]
       }
     ]

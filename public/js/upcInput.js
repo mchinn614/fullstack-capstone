@@ -5,6 +5,10 @@ const userName = local.getUserName();
 const jwt = local.getJwt();
 const userId = local.getUserId();
 
+//set userId
+$('.logout').empty();
+$('.logout').append(`Logout (${userName})`);
+
 const materials = api
   .getMaterials(jwt)
   .then(materials => {
@@ -30,8 +34,10 @@ function displayItem(item) {
 
   item.materials.forEach(material => {
     $('.material-list').append(
-      `<li data-id="${material._id}">
+      `<li data-id="${material._id}" class="material">
+      <div class="item-container">
       ${material.materialName}
+      </div>
       <span class="${material._id}"></span>
     </li>`
     );
@@ -39,7 +45,7 @@ function displayItem(item) {
   });
   Promise.all(promises).then(() => {
     console.log('test');
-    $('.results').append(`<button class=add-material>Add New Material</button>`);
+    $('.material-list').append(`<li><button class=add-material>Add New Material</button></li>`);
     $(addMaterial);
     $(vote);
   });
@@ -52,14 +58,18 @@ function renderVoteButton(domTarget, itemId, materialId) {
     return api.getUserVote(jwt, userId, itemId, materialId).then(userVote => {
       $(domTarget).empty();
       $(domTarget).append(
-        `<button  class="vote up-vote vote-${userVote}">
+        `<div class="button-container">
+          <button  class="vote up-vote vote-${userVote}">
             Up Vote (${totalVote.upVote})
-        </button>
+          </button>
+        </div>
+        <div class="button-container">
         <button class="vote down-vote vote-${userVote}">
             Down Vote (${totalVote.downVote})
-        </button>`
+        </button>
+        </div>`
       );
-      $(vote);
+      // $(vote);
       return totalVote;
     });
   });
@@ -84,15 +94,15 @@ function renderItems(upc) {
     })
     .catch(err => {
       console.log(err);
-      $('.messages').append(`<p>${err.message}</p>`);
+      $('.messages').append(`<p class="error-message">${err.message}</p>`);
     });
 }
 
 //event listeners
 //ERRROR with voting delayed. and then renders copy of materials??
 function vote() {
-  $('.messages').empty();
-  $('.vote').on('click', function() {
+  $('.results').on('click', '.vote', function() {
+    $('.messages').empty();
     console.log($(this).attr('class'));
 
     let vote = $(this).hasClass('up-vote') ? 1 : -1;
@@ -109,7 +119,9 @@ function vote() {
         renderVoteButton(`.${materialId}`, local.dataStore.item._id, materialId);
       })
       .catch(err => {
-        err.json().then(errObj => $('.messages').append(`<p>${errObj.message}</p>`));
+        err
+          .json()
+          .then(errObj => $('.messages').append(`<p class="error-message">${errObj.message}</p>`));
       });
   });
 }
@@ -117,9 +129,11 @@ function vote() {
 function addMaterial() {
   $('.add-material').on('click', event => {
     $('.material-list').append(
-      ` <div id="bloodhound">
+      ` <li class="new-material-dropdown">
+        <div id="bloodhound">
             <input class="typeahead" type="text" placeholder="New Material Name">
-        </div>`
+        </div>
+        </li>`
     );
     // constructs the suggestion engine
     var materials = new Bloodhound({
@@ -140,7 +154,9 @@ function addMaterial() {
         source: materials
       }
     );
-    $('.results').append('<button class="save">Save</button>');
+    $('.add-material').remove();
+    $('.new-material-dropdown').append('<button class="save">Save</button>');
+
     $(save);
   });
 }
@@ -149,25 +165,30 @@ function save() {
   $('.save').on('click', event => {
     $('.messages').empty();
 
-    var newMaterial = $('.tt-input').val();
-    var materialId = local.dataStore.materials.filter(x => x.materialName === newMaterial)[0]._id;
-
-    api
-      .postMaterialToItem(jwt, materialId, local.dataStore.item._id)
-      .then(updatedItem => {
-        console.log(updatedItem);
-        //vote
-        api.postVote(jwt, userId, local.dataStore.item._id, materialId, 1).then(() => {
-          //FIX THIS
-          return displayItem(updatedItem);
-          // $('.messages').append('<p>Material successfully added to item</p>');
+    let newMaterial = $('.tt-input').val();
+    console.log(local.dataStore.materials.find(x => x.materialName === newMaterial));
+    if (!local.dataStore.materials.find(x => x.materialName === newMaterial)) {
+      $('.messages').append('<p class="error-message">Please enter valid material</p>');
+    } else {
+      let materialId = local.dataStore.materials.filter(x => x.materialName === newMaterial)[0]._id;
+      api
+        .postMaterialToItem(jwt, materialId, local.dataStore.item._id)
+        .then(updatedItem => {
+          console.log(updatedItem);
+          //vote
+          api.postVote(jwt, userId, local.dataStore.item._id, materialId, 1).then(() => {
+            //FIX THIS
+            return displayItem(updatedItem);
+            // $('.messages').append('<p>Material successfully added to item</p>');
+          });
+        })
+        .catch(err => {
+          err.json().then(errObj => {
+            console.log(errObj);
+            $('.messages').append(`<p class="error-message">${errObj.message}</p>`);
+          });
         });
-      })
-      .catch(err => {
-        err.json().then(errObj => {
-          $('.messages').append(`<p>${errObj.message}</p>`);
-        });
-      });
+    }
   });
 }
 

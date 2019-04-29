@@ -11,13 +11,24 @@
   </head>
 
   <body>
-    <div class="row">
+    <div class="row nav-bar">
       <div class="col-12">
         <header role="navigation">
-          <ul>
-            <li><a class="home">Home</a></li>
-            <li><a class="add-item">Add Item</a></li>
-            <li><a class="login" href="../index.html">Login</a></li>
+          <ul class="nav-list">
+            <li class="app-title">
+              <div class="app-name">
+                <img
+                  class="recycle-symbol"
+                  src="..\images\recycle-symbol.png"
+                  alt="recycle symbol"
+                  height="30"
+                  width="30"
+                />recycle-app
+              </div>
+            </li>
+            <li class="nav-button"><a class="profile">Profile</a></li>
+            <li class="nav-button"><a class="add-item">Add Item</a></li>
+            <li class="nav-button"><a class="login">Login</a></li>
           </ul>
         </header>
       </div>
@@ -25,26 +36,26 @@
 
     <main role="main">
       <div class="row">
-        <div class="col-12">
-          <section role="region" class="login">
+        <div class="col-6">
+          <section role="region" class="login-form">
             <h2>Create New Account</h2>
             <form class="input-form">
               <fieldset>
                 <label for="username">Username</label>
                 <input type="text" class="new-username" name="username" required />
                 <label for="password1">Password</label>
-                <input type="text" class="new-password1" name="password1" required />
+                <input type="password" class="new-password1" name="password1" required />
                 <label for="password2">Re-type Password</label>
-                <input type="text" class="new-password2" name="password2" required />
+                <input type="password" class="new-password2" name="password2" required />
                 <button type="submit">Create Account</button>
               </fieldset>
             </form>
-            <div class="row">
-              <div class="col-6">
-                <section role="region" class="messages"></section>
-              </div>
-            </div>
           </section>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <section role="region" class="messages"></section>
         </div>
       </div>
     </main>
