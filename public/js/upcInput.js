@@ -69,7 +69,6 @@ function renderVoteButton(domTarget, itemId, materialId) {
         </button>
         </div>`
       );
-      // $(vote);
       return totalVote;
     });
   });
