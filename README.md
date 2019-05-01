@@ -15,9 +15,14 @@ Log in or create account to start tracking your purchases
 
 #### Profile
 View a history of all user purchases. Delete as appropriate. View a pie chart of the percentage of recyclable items from your puchase history. For now, the recyclabilty of the materials are based on the guidance from Recology in San Francisco, CA.
+![profile](public/images/Profile.JPG)
 
 #### Add Item
-Add items based on UPC. Add the materials that are disposed off from this item OR up/down vote the current materials based on your perception of accuracy. Repeate process as needed.
+Add items based on UPC. 
+![AddItem](public/images/AddItem.JPG)
+
+Add the materials that are disposed off from this item OR up/down vote the current materials based on your perception of accuracy. Repeate process as needed.
+![AddMaterial](public/images/Vote-AddMaterial.JPG)
 
 ## Technology Used
 The recycle-app uses jQuery, javascript, HTML, and CSS. The app was created using nodejs and API was created using Express. The data is persisted using Atlas (mongoDB).  https://api.upcitemdb.com API is used to relate UPCs to items. 
