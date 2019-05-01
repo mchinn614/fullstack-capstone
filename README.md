@@ -24,6 +24,15 @@ Add items based on UPC.
 Add the materials that are disposed off from this item OR up/down vote the current materials based on your perception of accuracy. Repeate process as needed.
 ![AddMaterial](public/images/Vote-AddMaterial.JPG)
 
+
+## API
+The app uses the following API endpoint. All HTTP requests must use Bearer Authorization with a JSON Web Token.  
+https://recycle-app.herokuapp.com/api
+
+### GET Endpoints
+
+
+
 ## Technology Used
 The recycle-app uses jQuery, javascript, HTML, and CSS. The app was created using nodejs and API was created using Express. The data is persisted using Atlas (mongoDB).  https://api.upcitemdb.com API is used to relate UPCs to items. 
 
