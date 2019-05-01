@@ -210,6 +210,12 @@ router.get('/purchase/:userId', bodyParser.json(), (req, res) => {
     });
 });
 
+router.get('/user/:userName', (req, res) => {
+  User.findOne({ username: req.params.userName }).then(user => {
+    res.status(200).json(user);
+  });
+});
+
 /////////////////////////
 //POST
 /////////////////////////

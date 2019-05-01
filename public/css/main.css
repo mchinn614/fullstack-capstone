@@ -221,6 +221,7 @@ h3 {
   margin-left: auto;
   margin-right: auto;
   display: block;
+  background-color: rgba(30, 30, 30, 1);
 }
 
 .error-message {
@@ -250,6 +251,26 @@ input[type='password'] {
 .bloodhound {
   margin-left: auto;
   margin-right: auto;
+}
+
+.upc-info {
+  font-style: italic;
+  font-size: 14px;
+  margin: 10px;
+  text-align: left;
+}
+
+.app-info {
+  font-style: italic;
+  font-size: 14px;
+  margin: 10px;
+  text-align: center;
+  padding: 2px;
+}
+
+.upc-link,
+.create-account {
+  text-decoration: underline;
 }
 
 /*typeahead css*/
