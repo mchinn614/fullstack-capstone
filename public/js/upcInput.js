@@ -13,10 +13,8 @@ const materials = api
   .getMaterials(jwt)
   .then(materials => {
     Object.assign(local.dataStore, { materials: materials });
-    console.log(local.dataStore);
   })
   .catch(err => {
-    console.log(err);
     $('.messages').append(err);
   });
 
@@ -44,7 +42,6 @@ function displayItem(item) {
     return promises.push(renderVoteButton(`.${material._id}`, item._id, material._id));
   });
   Promise.all(promises).then(() => {
-    console.log('test');
     $('.material-list').append(`<li><button class=add-material>Add New Material</button></li>`);
     $(addMaterial);
     $(vote);
@@ -52,7 +49,6 @@ function displayItem(item) {
 }
 
 //render material in list for each item. A container for the material should be defined prior to excuting function
-//WHY DOES THIS REPEAT
 function renderVoteButton(domTarget, itemId, materialId) {
   return api.getTotalVote(jwt, itemId, materialId).then(totalVote => {
     return api.getUserVote(jwt, userId, itemId, materialId).then(userVote => {
@@ -88,21 +84,17 @@ function renderItems(upc) {
           throw err;
         }
       });
-      //FIX THIS
       return displayItem(item);
     })
     .catch(err => {
-      console.log(err);
       $('.messages').append(`<p class="error-message">${err.message}</p>`);
     });
 }
 
 //event listeners
-//ERRROR with voting delayed. and then renders copy of materials??
 function vote() {
   $('.results').on('click', '.vote', function() {
     $('.messages').empty();
-    console.log($(this).attr('class'));
 
     let vote = $(this).hasClass('up-vote') ? 1 : -1;
 
@@ -110,11 +102,9 @@ function vote() {
       .closest('li')
       .attr('data-id');
 
-    console.log(materialId);
     api
       .postVote(jwt, userId, local.dataStore.item._id, materialId, vote)
       .then(updatedVote => {
-        console.log(updatedVote);
         renderVoteButton(`.${materialId}`, local.dataStore.item._id, materialId);
       })
       .catch(err => {
@@ -165,7 +155,6 @@ function save() {
     $('.messages').empty();
 
     let newMaterial = $('.tt-input').val();
-    console.log(local.dataStore.materials.find(x => x.materialName === newMaterial));
     if (!local.dataStore.materials.find(x => x.materialName === newMaterial)) {
       $('.messages').append('<p class="error-message">Please enter valid material</p>');
     } else {
@@ -173,17 +162,13 @@ function save() {
       api
         .postMaterialToItem(jwt, materialId, local.dataStore.item._id)
         .then(updatedItem => {
-          console.log(updatedItem);
           //vote
           api.postVote(jwt, userId, local.dataStore.item._id, materialId, 1).then(() => {
-            //FIX THIS
             return displayItem(updatedItem);
-            // $('.messages').append('<p>Material successfully added to item</p>');
           });
         })
         .catch(err => {
           err.json().then(errObj => {
-            console.log(errObj);
             $('.messages').append(`<p class="error-message">${errObj.message}</p>`);
           });
         });

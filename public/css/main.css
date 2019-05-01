@@ -98,48 +98,9 @@ h1 {
   background-color: white;
 }
 
-/* .instructions {
-  font-size: 16px;
-  text-align: left;
-  display: inline-block;
-  font-style: italic;
-  margin: 0px;
-  color: white;
-  text-shadow: black 1px 1px 3px;
-  width: 70%;
-} */
-
-/* .search-form {
-  display: inline-block;
-  height: 80px;
-  width: 70%;
-}
-
-.search {
-  display: inline-block;
-  width: 100%;
-  padding: 24px 0px 24px 16px;
-  font-size: 24px;
-  outline: none;
-} */
-
 input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px white inset;
 }
-
-/* .submit {
-  position: relative;
-  float: right;
-  top: -42px;
-  left: -1px;
-  outline: none;
-}
-
-h5 {
-  color: rgb(255, 0, 0);
-  text-shadow: white 1px 1px 4px;
-  font-size: 16px;
-} */
 
 a {
   text-decoration: none;
@@ -221,6 +182,71 @@ section {
   margin: 0px;
 }
 
+.profile-list,
+#chartContainer {
+  background: white;
+  border: solid black 2px;
+  color: rgb(33, 33, 33);
+  padding: 10px;
+  margin: 7px;
+}
+
+#chartContainer {
+  padding: 0;
+}
+.materials {
+  font-size: 12px;
+  font-style: italic;
+  text-align: left;
+}
+
+.product-name {
+  text-align: left;
+}
+
+.material-list,
+.messages {
+  max-width: 400px;
+  padding: 0px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h3 {
+  text-align: center;
+}
+
+.save,
+.add-material {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+}
+
+.paginationjs {
+  margin: 7px;
+}
+
+/*style input fields*/
+
+fieldset {
+  border: 0;
+}
+
+input[type='text'],
+label,
+input[type='password'] {
+  width: 100%;
+  display: inline-block;
+  margin: 10px;
+  text-align: left;
+}
+
 .bloodhound {
   margin-left: auto;
   margin-right: auto;
@@ -273,68 +299,6 @@ section {
 
 .tt-suggestion p {
   margin: 0;
-}
-
-.profile-list,
-#chartContainer {
-  background: white;
-  border: solid black 2px;
-  color: rgb(33, 33, 33);
-  padding: 10px;
-  margin: 7px;
-}
-
-.materials {
-  font-size: 12px;
-  font-style: italic;
-  text-align: left;
-}
-
-.product-name {
-  text-align: left;
-}
-
-.material-list,
-.messages {
-  max-width: 400px;
-  padding: 0px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-h3 {
-  text-align: center;
-}
-
-.save,
-.add-material {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-}
-
-.error-message {
-  color: red;
-  text-align: center;
-}
-
-.paginationjs {
-  margin: 7px;
-}
-
-/*style input fields*/
-
-fieldset {
-  border: 0;
-}
-
-input[type='text'],
-label,
-input[type='password'] {
-  width: 100%;
-  display: inline-block;
-  margin: 10px;
-  text-align: left;
 }
 
 @media only screen and (min-device-width: 320px) and (max-device-width: 648px) {

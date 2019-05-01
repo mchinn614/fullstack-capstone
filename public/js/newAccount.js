@@ -14,13 +14,11 @@ function watchSubmit() {
       api
         .postUser(userName, pw1)
         .then(responseJson => {
-          console.log(responseJson);
           $('.messages').append(
             '<p class="error-message">Account created successfully. Please login <a href="/index.html">here</a>.</p>'
           );
         })
         .catch(err => {
-          console.log(err);
           err.json().then(errObj => {
             $('.messages').append(`<p class="error-message">${errObj.message}</p>`);
           });
@@ -37,7 +35,6 @@ function profile() {
     $('.messages').empty();
     try {
       const jwt = local.getJwt();
-      console.log(jwt);
       window.location.href = '/views/profile.html';
     } catch {
       $('.messages').append(`<p class="error-message">Please login first</p>`);

@@ -44,7 +44,6 @@ const api = (function() {
         authorization: `Bearer ${authToken}`
       }
     }).then(response => {
-      console.log(response);
       if (!response.ok) {
         throw response;
       }
@@ -76,7 +75,6 @@ const api = (function() {
         Authorization: `Bearer ${authToken}`
       }
     }).then(response => {
-      console.log(response);
       if (response.ok) {
         return response.json().vote;
       } else {

@@ -14,7 +14,6 @@ function watchSubmit() {
         const userName = JSON.parse(sessionStorage.getItem('username'));
         const jwt = JSON.parse(sessionStorage.getItem('jwt'));
         return api.getUser(jwt.authToken, userName).then(user => {
-          console.log(user);
           sessionStorage.setItem('userId', JSON.stringify(user._id));
           return user._id;
         });
@@ -31,7 +30,6 @@ function profile() {
     $('.messages').empty();
     try {
       const jwt = local.getJwt();
-      console.log(jwt);
       window.location.href = '/views/profile.html';
     } catch {
       $('.messages').append(`<p class="error-message">Please login first</p>`);

@@ -14,7 +14,6 @@ function renderProfile() {
     .getPurchaseHistory(jwt, userId)
     .then(purchaseHistory => {
       const purchases = purchaseHistory.result;
-      console.log(purchases);
 
       $('.page-results').pagination({
         dataSource: purchases,
@@ -41,16 +40,12 @@ function renderProfile() {
       makeChart(countRecycle, total);
     })
     .catch(err => {
-      err.json().then(errObj => {
-        console.log(errObj);
-      });
+      err.json().then(errObj => {});
     });
 }
 
 function template(purchases) {
-  console.log(purchases);
   return purchases.map(purchase => {
-    console.log(purchase.recyclability);
     return `<div class="profile-list">
     <h3 class="product-name" data-item-id="${purchase.item._id}">${purchase.item.product.title}</h3>
   <p class="materials">Materials: 
@@ -102,15 +97,11 @@ function deleteItem() {
       .parent()
       .find('h3')
       .attr('data-item-id');
-    console.log(itemId);
     return api
       .deletePurchase(jwt, userId, itemId)
       .then(() => renderProfile())
       .catch(err => {
-        console.log(err);
-        err.json().then(errObj => {
-          console.log(errObj);
-        });
+        err.json().then(errObj => {});
       });
   });
 }
