@@ -11,6 +11,7 @@ Users will log in to their profile, add items to the purchase history by UPC (ba
 
 #### Landing Page
 Log in or create account to start tracking your purchases
+public/images/Login.JPG
 
 #### Profile
 View a history of all user purchases. Delete as appropriate. View a pie chart of the percentage of recyclable items from your puchase history. For now, the recyclabilty of the materials are based on the guidance from Recology in San Francisco, CA.
