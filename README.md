@@ -27,9 +27,15 @@ Add the materials that are disposed off from this item OR up/down vote the curre
 
 ## API
 The app uses the following API endpoint. All HTTP requests must use Bearer Authorization with a JSON Web Token.  
-https://recycle-app.herokuapp.com/api
+API URL: https://recycle-app.herokuapp.com/api
 
 ### GET Endpoints
+
+#### /materials
+returns all materials in database
+
+
+
 
 
 
