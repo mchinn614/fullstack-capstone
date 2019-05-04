@@ -178,7 +178,8 @@ const api = (function() {
   }
 
   function getPurchaseHistory(authToken, userId) {
-    return fetch(`/api/purchase/${userId}?cityId=5ca2d2bce3cdd0915f1e5897`, {
+    // hard coded city Id to return San Francisco
+    return fetch(`/api/purchase/${userId}?cityId=5ca2d2bce3cdd0915f1e5897 `, {
       headers: {
         Authorization: `Bearer ${authToken}`
       }

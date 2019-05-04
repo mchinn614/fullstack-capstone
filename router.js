@@ -374,6 +374,7 @@ router.delete('/purchase', bodyParser.json(), (req, res) => {
 // //add new city - for dev only
 // router.post('/city/:city', bodyParser.json(), (req, res) => {
 //   const recycleMaterials = req.body.recycle;
+//   console.log(recycleMaterials);
 //   var materialIds = [];
 //   for (let i = 0; i < recycleMaterials.length; i++) {
 //     Materials.findOne({ materialName: recycleMaterials[i] })
@@ -389,6 +390,7 @@ router.delete('/purchase', bodyParser.json(), (req, res) => {
 //         }
 //       })
 //       .then(ids => {
+//         console.log('ids', ids);
 //         City.findOneAndUpdate(
 //           { cityName: req.params.city },
 //           { recyclableMaterial: ids },
