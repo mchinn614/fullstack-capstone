@@ -26,7 +26,7 @@ Add the materials that are disposed off from this item OR up/down vote the curre
 
 
 ## API
-The app uses the following API endpoint. All HTTP requests must use Bearer Authorization with a JSON Web Token.  
+The app uses the following API endpoint. All HTTP requests must use Bearer Authorization with a JSON Web Token.  Note that all Id parameters refer to the uniqueid assigned by the Mongodb database.
 API URL: https://recycle-app.herokuapp.com/api
 
 ### GET Endpoints
@@ -34,7 +34,23 @@ API URL: https://recycle-app.herokuapp.com/api
 #### /materials
 returns all materials in database
 
-#### /upc/ ```html <div style="color:red">upc</div>```
+#### /upc/*upc*
+path param as upc. Returns item object
+
+#### /item/*itemId*
+path param is unique database id for given item. Get unique id using /upc/*upc* endpoint. Returns item object
+
+#### /voteCount
+send materialId=*materialId*&itemId=*itemId* as query params. Returns current up/down vote count for item/material combination
+
+#### /userVote
+send materialId=*materialId*&itemId=*itemId*&userId=*userId* as query params. Returns the user's up/down vote for a given item/material combination
+
+
+#### /purchase/*userId*
+Send userId as path param. Returns the purchase history for that user.
+
+### POST endpoints
 
 
 
