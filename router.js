@@ -242,9 +242,7 @@ router.post('/purchase', bodyParser.json(), (req, res) => {
           status: 406
         };
         throw err;
-      }
-      // ERROR here=why can't I pass err.message or err.status to res
-      else {
+      } else {
         return res.status(200).json(addedPurchase);
       }
     })
