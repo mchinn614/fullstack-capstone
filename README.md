@@ -34,6 +34,8 @@ API URL: https://recycle-app.herokuapp.com/api
 #### /materials
 returns all materials in database
 
+#### /upc/ ```html <div style="color:red">upc</div>```
+
 
 
 
