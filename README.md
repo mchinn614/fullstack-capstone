@@ -24,6 +24,8 @@ Add items based on UPC.
 Add the materials that are disposed off from this item OR up/down vote the current materials based on your perception of accuracy. Repeate process as needed.
 ![AddMaterial](public/images/Vote-AddMaterial.JPG)
 
+## Technology Used
+The recycle-app uses jQuery, javascript, HTML, and CSS. The app was created using nodejs and API was created using Express. The data is persisted using Atlas (mongoDB).  https://api.upcitemdb.com API is used to relate UPCs to items. 
 
 ## API
 The app uses the following API endpoint. All HTTP requests must use Bearer Authorization with a JSON Web Token.  Note that all Id parameters refer to the uniqueid assigned by the Mongodb database.
@@ -52,13 +54,19 @@ Send userId as path param. Returns the purchase history for that user.
 
 ### POST endpoints
 
+#### /purchase
+Send {userId:*userId*,itemId:*itemId*} in body as json to register the purchase of an item to that user
 
+#### /addMaterialtoItem
+Send {materialId:*materialId*,itemId:*itemId*} in body as json to register the a material to a given item
 
+#### /vote
+Send {userId:*userId*,itemId:*itemId*,vote:*vote*,materialId:*materialId*} in body to register user vote for a given item/material combination. Vote can be 1 for an up vote or -1 for a downvote. This endpoint will also edit the current vote of the user if a vote already exists.
 
+### DELETE endpoints
 
-
-## Technology Used
-The recycle-app uses jQuery, javascript, HTML, and CSS. The app was created using nodejs and API was created using Express. The data is persisted using Atlas (mongoDB).  https://api.upcitemdb.com API is used to relate UPCs to items. 
+#### /purchase
+Send {itemId:*itemId*,userId:*userId*} in body to delete an item from the given users profile.
 
 ## Future Plans
 In the future, new materials can be added to the database. Recycling guidance for other cities will be added 
