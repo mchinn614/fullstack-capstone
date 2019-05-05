@@ -26,9 +26,8 @@ router.get('/materials', (req, res) => {
 
 function getUpc(upc) {
   return axios
-    .get(`https://api.upcitemdb.com/prod/trial/lookup?upc=${upc}`)
+    .get(`https://api.upcitemdb.com/prod/trial/lookup?upc=${upc}`, { timeout: 5000 })
     .then(res => {
-      console.log('res', res);
       return res.data.items[0];
     })
     .catch(err => {
@@ -41,7 +40,14 @@ router.get('/upc/:upc', function(req, res) {
   return getUpc(req.params.upc)
     .then(item => {
       //check if item exists
-      if (!item.upc) {
+      if (!item) {
+        const err = {
+          code: '002',
+          message: 'Item does not exist',
+          status: 406
+        };
+        throw err;
+      } else if (!item.upc) {
         const err = {
           code: '002',
           message: 'Item does not exist',
@@ -71,7 +77,6 @@ router.get('/upc/:upc', function(req, res) {
         });
     })
     .catch(err => {
-      console.log('return err', err);
       res.status(err.status).json(err);
     });
 });
