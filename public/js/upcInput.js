@@ -75,18 +75,15 @@ function renderItems(upc) {
   api
     .getItem(jwt, upc)
     .then(item => {
+      if (item.message) {
+        throw item;
+      }
       // POST item to purchase history
-      api.postItem(jwt, userId, item._id).then(response => {
-        if (!response.ok) {
-          const err = {
-            message: 'Item not registered'
-          };
-          throw err;
-        }
-      });
+      api.postItem(jwt, userId, item._id);
       return displayItem(item);
     })
     .catch(err => {
+      console.log(err);
       $('.messages').append(`<p class="error-message">${err.message}</p>`);
     });
 }

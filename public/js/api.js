@@ -9,9 +9,6 @@ const api = (function() {
       },
       body: JSON.stringify({ username: userName, password: pw })
     }).then(response => {
-      if (!response.ok) {
-        throw response;
-      }
       return response.json();
     });
   }
@@ -104,11 +101,7 @@ const api = (function() {
         Authorization: `Bearer ${authToken}`
       }
     }).then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw response.json();
-      }
+      return response.json();
     });
   }
 
@@ -124,14 +117,7 @@ const api = (function() {
         itemId: itemId
       })
     }).then(response => {
-      if (!response.ok) {
-        const err = {
-          message: 'Item not registered'
-        };
-        throw err;
-      } else {
-        return response.json();
-      }
+      return response.json();
     });
   }
 

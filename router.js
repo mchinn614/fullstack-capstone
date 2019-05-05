@@ -25,9 +25,15 @@ router.get('/materials', (req, res) => {
 // UPC DB request to return first item
 
 function getUpc(upc) {
-  return axios.get(`https://api.upcitemdb.com/prod/trial/lookup?upc=${upc}`).then(res => {
-    return res.data.items[0];
-  });
+  return axios
+    .get(`https://api.upcitemdb.com/prod/trial/lookup?upc=${upc}`)
+    .then(res => {
+      console.log('res', res);
+      return res.data.items[0];
+    })
+    .catch(err => {
+      return err;
+    });
 }
 
 //GET: make client request to upc db api and add item to db
@@ -65,6 +71,7 @@ router.get('/upc/:upc', function(req, res) {
         });
     })
     .catch(err => {
+      console.log('return err', err);
       res.status(err.status).json(err);
     });
 });
