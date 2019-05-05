@@ -360,7 +360,7 @@ router.delete('/purchase', bodyParser.json(), (req, res) => {
     .catch(err => res.status(err.status).json(err));
 });
 
-// //add new material - for dev only
+// //add new material - for dev  only
 // router.post('/materials', bodyParser.json(), (req, res) => {
 //   return Materials.create({ materialName: req.body.material })
 //     .then(() => {
